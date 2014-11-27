@@ -19,6 +19,18 @@ public class Request {
         this.type = type;
     }
 
+    public boolean isRequest(){
+        return type == TYPE.REQUEST_FILE;
+    }
+
+    public boolean isAuthenticate(){
+        return type == TYPE.AUTHENTICATE;
+    }
+
+    public boolean isFinish(){
+        return type == TYPE.FINISH;
+    }
+
     public String getUserName() {
         return userName;
     }

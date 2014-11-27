@@ -10,19 +10,29 @@ public class Client {
 
     private String userName;
     private String key;
-    private String serverAddress;
+    private String hostName;
 
-    public Client(String userName, String key, String serverAddress){
+    public Client(String hostName, String userName, String key){
         this.userName = userName;
         this.key = key;
-        this.serverAddress = serverAddress;
+        this.hostName = hostName;
     }
 
     /**
-     * Connects to server with serverAddress
+     * Connects to server with hostName
      */
-    public void connectToServer(){
+    public void connectToServer(int portNumber){
 
+    }
+
+    /**
+     * Requests fileName from the server and returns the response from the server
+     * @param fileName requested from server
+     * @return Response from server
+     */
+    public Response requestFile(String fileName){
+
+        return null;
     }
 
     /**
@@ -47,4 +57,8 @@ public class Client {
 
     }
 
+
+    public String getUserName(){
+        return userName;
+    }
 }
