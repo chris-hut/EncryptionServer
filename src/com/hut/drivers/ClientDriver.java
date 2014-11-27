@@ -4,6 +4,9 @@ import com.hut.Request;
 import com.hut.Response;
 import com.hut.client.Client;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 /**
@@ -19,7 +22,11 @@ public class ClientDriver {
         Client client = new Client(args[0], args[1], args[2]);
         final int portNumber = 16000;
 
-        client.connectToServer(portNumber);
+        if(!client.connectToServer(portNumber)){
+            System.out.println("Invalid credentials.");
+            System.out.println("Exiting...");
+            System.exit(0);
+        }
 
         Scanner s = new Scanner(System.in);
         String input = null;
@@ -31,6 +38,11 @@ public class ClientDriver {
                 continue;
             }
 
+            if(input.equalsIgnoreCase("exit")){
+                client.finishConnection();
+                break;
+            }
+
             response = client.requestFile(input);
 
             if(response == null){
@@ -40,6 +52,22 @@ public class ClientDriver {
 
             if(response.getStatusCode() == 200){
                 // response is good we'll get the file
+                // TODO: Put this in FileDownloader
+                String[] fileInfo = response.getMessage().split("\n");
+                String fileName = fileInfo[0];
+                try{
+                    File file = new File(fileName);
+                    PrintWriter pw = new PrintWriter(file);
+                    System.out.println("Downloading file...");
+                    for(int i = 1; i < fileInfo.length; i++){
+                        // TODO: Fancy download animation
+                        pw.println(fileInfo[i]);
+                    }
+                    pw.close();
+                    System.out.println(String.format("File: %s download complete", fileName));
+                }catch(FileNotFoundException e){
+
+                }
             }else if(response.getStatusCode() == 404){
                 // File doesn't exist
                 System.out.println(String.format("File: %s doesn't exist", input));
@@ -64,9 +92,6 @@ public class ClientDriver {
             return true;
         }
 
-        if(input.equalsIgnoreCase(EXIT_STRING)){
-            return true;
-        }
         return false;
     }
 

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="encyrptionserver" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="128m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.7" value="${jdk.home.1.7}/bin"/>
+  <path id="jdk.classpath.1.7">
+    <fileset dir="${jdk.home.1.7}">
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/jfr.jar"/>
+      <include name="jre/lib/jfxrt.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.7}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.7}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.7"/>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module EncryptionServer -->
+  
+  <dirname property="module.encryptionserver.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.encryptionserver" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.encryptionserver" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.encryptionserver" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.encryptionserver" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  
+  <property name="encryptionserver.output.dir" value="${module.encryptionserver.basedir}/out/production/EncryptionServer"/>
+  <property name="encryptionserver.testoutput.dir" value="${module.encryptionserver.basedir}/out/test/EncryptionServer"/>
+  
+  <path id="encryptionserver.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="encryptionserver.module.production.classpath">
+    <path refid="${module.jdk.classpath.encryptionserver}"/>
+  </path>
+  
+  <path id="encryptionserver.runtime.production.module.classpath">
+    <pathelement location="${encryptionserver.output.dir}"/>
+  </path>
+  
+  <path id="encryptionserver.module.classpath">
+    <path refid="${module.jdk.classpath.encryptionserver}"/>
+    <pathelement location="${encryptionserver.output.dir}"/>
+  </path>
+  
+  <path id="encryptionserver.runtime.module.classpath">
+    <pathelement location="${encryptionserver.testoutput.dir}"/>
+    <pathelement location="${encryptionserver.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.encryptionserver">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.encryptionserver">
+    <patternset refid="excluded.from.module.encryptionserver"/>
+  </patternset>
+  
+  <path id="encryptionserver.module.sourcepath">
+    <dirset dir="${module.encryptionserver.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.encryptionserver" depends="compile.module.encryptionserver.production,compile.module.encryptionserver.tests" description="Compile module EncryptionServer"/>
+  
+  <target name="compile.module.encryptionserver.production" description="Compile module EncryptionServer; production classes">
+    <mkdir dir="${encryptionserver.output.dir}"/>
+    <javac destdir="${encryptionserver.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.encryptionserver}/javac">
+      <compilerarg line="${compiler.args.encryptionserver}"/>
+      <bootclasspath refid="encryptionserver.module.bootclasspath"/>
+      <classpath refid="encryptionserver.module.production.classpath"/>
+      <src refid="encryptionserver.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.encryptionserver"/>
+    </javac>
+    
+    <copy todir="${encryptionserver.output.dir}">
+      <fileset dir="${module.encryptionserver.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.encryptionserver.tests" depends="compile.module.encryptionserver.production" description="compile module EncryptionServer; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.encryptionserver" description="cleanup module">
+    <delete dir="${encryptionserver.output.dir}"/>
+    <delete dir="${encryptionserver.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.encryptionserver" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.encryptionserver" description="build all modules"/>
+  
+  <target name="all" depends="build.modules" description="build all"/>
+</project>

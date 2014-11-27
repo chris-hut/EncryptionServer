@@ -5,6 +5,9 @@ package com.hut;
  */
 public class Request {
 
+    public final static String AUTHENTICATE = "authenticate me please";
+    public final static String FINISH = "please go away";
+
     private String userName;
     private String message;
     private TYPE type;

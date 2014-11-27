@@ -37,7 +37,6 @@ public class Server {
         try{
             socket = new ServerSocket(this.portNumber);
 
-
             /*
                 Loop forever, whenever someone attaches to us, we create a new ServerThread giving it
                 the resulting Socket, and throw the ServerThread in our list of threads.

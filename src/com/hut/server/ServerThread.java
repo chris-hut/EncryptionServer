@@ -19,6 +19,7 @@ public class ServerThread extends Thread{
     private Socket socket;
     private boolean authenticated = false;
     private String user = null;
+    private ObjectOutputStream oos = null;
 
     public ServerThread(Socket socket, HashMap<String, String> users){
         super("ServerThread");
@@ -29,12 +30,13 @@ public class ServerThread extends Thread{
     public void run(){
         try{
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos = new ObjectOutputStream(socket.getOutputStream());
 
             Request request;
             Response response;
 
             boolean alive = true;
+            FileDownloader fd = new FileDownloader();
 
             while(alive){
 
@@ -45,14 +47,11 @@ public class ServerThread extends Thread{
                         finish();
                         alive = false;
                     }else if(request.isRequest()){
-                        FileDownloader fd = new FileDownloader();
                         // TODO: Decrypt fileName
 
-                        /*
-                        TODO: Should we check first if the file exists before even calling FileDownloader?
-                        Or should we make FileDownloader return a properly formatted response, which either consists
-                        of the file or the not found response
-                         */
+                        String fileName = request.getMessage();
+                        response = fd.getFileResponse(fileName);
+
 
                     } else if(request.isAuthenticate()){
                         /*
@@ -79,6 +78,15 @@ public class ServerThread extends Thread{
 
         }
         // TODO: do you do the check if ois or oos are not closed here?
+    }
+
+    public void sendResponse(Response r){
+        try{
+            oos.writeObject(r);
+
+        }catch(IOException e){
+            System.out.println("Error sending response");
+        }
     }
 
     /**

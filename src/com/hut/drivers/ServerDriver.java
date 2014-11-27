@@ -10,12 +10,15 @@ public class ServerDriver {
 
     public static void main(String args[]){
 
+
         initializeUsers();
 
         int portNumber = 16000;
 
+        System.out.println("Starting server...");
         Server s = new Server(portNumber, users);
         s.serve();
+        // TODO: Add way to kill server
     }
 
     public static void initializeUsers(){
