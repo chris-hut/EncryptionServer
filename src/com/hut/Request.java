@@ -46,7 +46,7 @@ public class Request implements Serializable{
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(" message: ").append(this.message)
+        sb.append("Message: ").append(this.message)
                 .append(" type: ").append(this.type.toString());
         return sb.toString();
     }

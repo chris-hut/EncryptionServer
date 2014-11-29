@@ -38,6 +38,7 @@ public class ServerThread extends Thread{
 
     private void setupLogger(){
         try{
+            // Hack to put logs in log folder
             new File("./logs").mkdir();
             fh = new FileHandler("logs/server_thread.log");
             log.addHandler(fh);
@@ -93,11 +94,9 @@ public class ServerThread extends Thread{
                 }else{
                     authenticated = authorize(unencryptedRequest);
                     if(authenticated){
-                        log.fine(String.format("User: %s authenticated successfully", this.userName));
                         // Send user okay
                         response = new Response(Response.OK, Response.AUTHORIZED_MESSAGE);
                     }else{
-                        log.fine(String.format("User provided invalid authentication"));
                         // Send them oh no
                         response = new Response(Response.UNAUTHORIZED, Response.UNAUTHORIZED_MESSAGE);
                     }
@@ -105,6 +104,7 @@ public class ServerThread extends Thread{
                 sendResponse(response);
             }
 
+            log.fine("Closing server");
             ois.close();
             oos.close();
             finish();
@@ -161,7 +161,7 @@ public class ServerThread extends Thread{
 
         // Go through our list of user-keys checking for a match
         for(String encryptionKey: this.users.values()){
-            TeaEncryptionHelper th = new TeaEncryptionHelper(encryptionKey.getBytes());
+            TeaEncryptionHelper th = new TeaEncryptionHelper(encryptionKey);
             String userName = th.decryptString(r.getMessage());
             if(this.users.containsKey(userName)){
                 // We have a match
@@ -173,7 +173,6 @@ public class ServerThread extends Thread{
         }
 
         log.fine(String.format("User provided invalid authentication"));
-
         return false;
     }
 

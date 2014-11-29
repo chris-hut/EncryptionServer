@@ -29,13 +29,14 @@ public class Client {
         this.userName = userName;
         this.key = key;
         this.hostName = hostName;
-        encryptionHelper = new TeaEncryptionHelper(userName);
+        encryptionHelper = new TeaEncryptionHelper(key);
 
         setupLogger();
     }
 
     private void setupLogger(){
         try{
+            // Hack to put logs in log folder
             new File("./logs").mkdir();
             fh = new FileHandler("logs/client.log");
             log.addHandler(fh);
@@ -70,9 +71,6 @@ public class Client {
                 log.fine("No response from server");
                 return false;
             }
-
-            log.fine(String.format("Response from server: StatusCode: %d\nMessage: %s",
-                    response.getStatusCode(), response.getMessage()));
 
             if(response.getStatusCode() == 200){
                 // Successfully authenticated
@@ -137,10 +135,15 @@ public class Client {
     }
 
     private Response decryptResponse(Response r){
-        return new Response(
-            r.getStatusCode(),
-            this.encryptionHelper.decryptString(r.getMessage())
-        );
+        if(r.getStatusCode() == 401){
+            // Unauthorized message, not encrypted
+            return r;
+        } else{
+            return new Response(
+                r.getStatusCode(),
+               this.encryptionHelper.decryptString(r.getMessage())
+            );
+        }
     }
 
     /**

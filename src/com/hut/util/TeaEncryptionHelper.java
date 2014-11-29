@@ -2,8 +2,10 @@ package com.hut.util;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Created by chris on 11/26/14.
@@ -17,11 +19,13 @@ public class TeaEncryptionHelper {
     }
 
     public TeaEncryptionHelper(byte[] key){
-        System.out.println(System.getProperty("java.library.path"));
+        //System.out.println(System.getProperty("java.library.path"));
+        // TODO: catch the not linked error and output an informational message before closing
         System.loadLibrary("tea_encryption_helper");
 
-        // convert key into int key
+        // convert key into 16-bit key
         this.key = new int[4];
+
         try{
             MessageDigest md = MessageDigest.getInstance("MD5");
             ByteBuffer bb = ByteBuffer.wrap(md.digest(key));
@@ -54,8 +58,7 @@ public class TeaEncryptionHelper {
         }
 
 
-        // Cycle two ints in array
-        int[] cipherText  = new int[2];
+        int[] cipherText = new int[2];
         int[] fullCipher;
         if(buf.length % 2 > 0){
             fullCipher = new int[buf.length + 1];
@@ -67,7 +70,7 @@ public class TeaEncryptionHelper {
 
         for(int i = 0; i < buf.length; i +=2){
             cipherText[0] = buf[i];
-            if(i < buf.length-1){
+            if((i+1) < buf.length){
                 cipherText[1] = buf[i+1];
             }else{
                 cipherText[1] = 0;
