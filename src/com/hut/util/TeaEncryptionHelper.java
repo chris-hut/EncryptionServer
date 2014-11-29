@@ -17,6 +17,7 @@ public class TeaEncryptionHelper {
     }
 
     public TeaEncryptionHelper(byte[] key){
+        System.out.println(System.getProperty("java.library.path"));
         System.loadLibrary("tea_encryption_helper");
 
         // convert key into int key
