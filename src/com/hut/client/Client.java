@@ -2,6 +2,7 @@ package com.hut.client;
 
 import com.hut.Request;
 import com.hut.Response;
+import com.hut.util.TeaEncryptionHelper;
 
 import java.io.*;
 import java.net.Socket;
@@ -22,11 +23,13 @@ public class Client {
     private InputStream inputStream;
     private ObjectInputStream objectInputStream;
     private Handler fh;
+    private TeaEncryptionHelper encryptionHelper;
 
     public Client(String hostName, String userName, String key){
         this.userName = userName;
         this.key = key;
         this.hostName = hostName;
+        encryptionHelper = new TeaEncryptionHelper(userName);
 
         setupLogger();
     }
@@ -101,11 +104,11 @@ public class Client {
 
 
     /**
-     * Sends a request to the server and returns the servers response
+     * Sends a request to the server and returns the servers response, performing all encryption/decryption
      * @param r the request to send to the server
-     * @return Servers Response
+     * @return Server's unencrypted response
      */
-    public Response sendRequest(Request r){
+    private Response sendRequest(Request r){
         Response response = null;
         try{
             oos.writeObject(r);
@@ -120,6 +123,21 @@ public class Client {
         }
 
         return response;
+    }
+
+    private Request encryptRequest(Request r){
+        return new Request(
+            new String(this.encryptionHelper.encrypt(r.getUserName())),
+            new String(this.encryptionHelper.encrypt(r.getMessage())),
+            r.getType()
+        );
+    }
+
+    private Response decryptResponse(Response r){
+        return new Response(
+            r.getStatusCode(),
+            this.encryptionHelper.decryptString(r.getMessage())
+        );
     }
 
     /**

@@ -3,6 +3,7 @@ package com.hut.server;
 import com.hut.Request;
 import com.hut.Response;
 import com.hut.util.FileDownloader;
+import com.hut.util.TeaEncryptionHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,9 +23,10 @@ public class ServerThread extends Thread{
     private HashMap<String, String> users;
     private Socket socket;
     private boolean authenticated = false;
-    private String user = null;
+    private String userName = null;
     private ObjectOutputStream oos = null;
     private Handler fh;
+    private TeaEncryptionHelper encryptionHelper = null;
 
     public ServerThread(Socket socket, HashMap<String, String> users){
         super("ServerThread");
@@ -59,12 +61,16 @@ public class ServerThread extends Thread{
 
             while(alive){
 
-                request = (Request) ois.readObject();
-                log.fine(String.format("Request: Username: %s\nmessage: %s\ntype: %s\n",
-                        request.getUserName(), request.getMessage(), request.getType().toString()));
-
+                Request unencryptedRequest = (Request) ois.readObject();
 
                 if(authenticated){
+
+                    request = decryptRequest(unencryptedRequest);
+                    // TODO: check if can't decrypt properly
+
+                    log.fine(String.format("Request: Username: %s\nmessage: %s\ntype: %s\n",
+                            request.getUserName(), request.getMessage(), request.getType().toString()));
+
                     if(request.isFinish()){
                         finish();
                         // TODO: set response to be yeah I finish now
@@ -86,12 +92,13 @@ public class ServerThread extends Thread{
                         // TODO: Ask user what the hell that was, this shouldn't be possible as type is enum
                     }
                 }else{
-                    authenticated = authorize(request);
+                    authenticated = authorize(unencryptedRequest);
                     if(authenticated){
+                        log.fine(String.format("User: %s authenticated successfully", this.userName));
                         // Send user okay
                         response = new Response(Response.OK, Response.AUTHORIZED_MESSAGE);
                     }else{
-                        log.fine(String.format("User: %s didn't authenticate", request.getUserName()));
+                        log.fine(String.format("User provided invalid authentication"));
                         // Send them oh no
                         response = new Response(Response.UNAUTHORIZED, Response.UNAUTHORIZED_MESSAGE);
                     }
@@ -101,6 +108,7 @@ public class ServerThread extends Thread{
 
             ois.close();
             oos.close();
+            finish();
         }catch(IOException e){
 
         }catch(ClassNotFoundException e){
@@ -109,13 +117,31 @@ public class ServerThread extends Thread{
         // TODO: do you do the check if ois or oos are not closed here?
     }
 
-    public void sendResponse(Response r){
+    private void sendResponse(Response r){
         try{
-            oos.writeObject(r);
+            oos.writeObject(encryptResponse(r));
 
         }catch(IOException e){
             log.severe("IO error when sending response\n" + e.getMessage());
         }
+    }
+
+    private Response encryptResponse(Response unencryptedResponse){
+        return new Response(
+            // TODO: Should statusCode be encrypted
+            // I say it shouldn't otherwise client will not be able to understand that it wasn't able to authenticate
+            unencryptedResponse.getStatusCode(),
+            new String(this.encryptionHelper.encrypt(unencryptedResponse.getMessage()))
+        );
+    }
+
+    private Request decryptRequest(Request encryptedRequest){
+        return new Request(
+                this.encryptionHelper.decryptString(encryptedRequest.getUserName()),
+                this.encryptionHelper.decryptString(encryptedRequest.getMessage()),
+                // TODO: Should type be encrypted?
+                encryptedRequest.getType()
+        );
     }
 
     /**
@@ -123,16 +149,22 @@ public class ServerThread extends Thread{
      * @param r request containing authorization details
      * @return true if client successfully authorizes
      */
-    public boolean authorize(Request r){
+    private boolean authorize(Request r){
         if(!r.isAuthenticate()){
             return false;
         }
 
-        // TODO: Check decrypt message first
-        if(this.users.containsKey(r.getUserName())){
-            return true;
+        // Go through our list of user-keys checking for a match
+        for(String encryptionKey: this.users.values()){
+            TeaEncryptionHelper th = new TeaEncryptionHelper(encryptionKey.getBytes());
+            String userName = th.decryptString(r.getMessage());
+            if(this.users.containsKey(userName)){
+                // We have a match
+                this.userName = userName;
+                this.encryptionHelper = th;
+                return true;
+            }
         }
-
 
         return false;
     }
@@ -141,7 +173,9 @@ public class ServerThread extends Thread{
      * Cleans up nicely
      */
     public void finish(){
-
+        /*TODO This can be called from Server class to kill all threads, proper cleanup should be done here WRT
+            the streams and possibly sending client a goodbye message
+         */
         if(fh != null){
             fh.close();
         }
