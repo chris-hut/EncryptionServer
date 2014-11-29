@@ -9,11 +9,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.logging.*;
 
 /**
  *
  */
 public class ServerThread extends Thread{
+
+    private static final Logger log = Logger.getLogger(ServerThread.class.getName());
 
     private HashMap<String, String> users;
     private Socket socket;
@@ -25,6 +28,20 @@ public class ServerThread extends Thread{
         super("ServerThread");
         this.socket = socket;
         this.users = users;
+        System.out.println("New server created");
+        setupLogger();
+    }
+
+    private void setupLogger(){
+        try{
+
+            Handler fh = new FileHandler("server_thread.log");
+            log.addHandler(fh);
+            fh.setFormatter(new SimpleFormatter());
+        }catch(IOException e){
+            // Error setting up logging
+        }
+        log.setLevel(Level.FINEST);
     }
 
     public void run(){
@@ -33,7 +50,7 @@ public class ServerThread extends Thread{
             oos = new ObjectOutputStream(socket.getOutputStream());
 
             Request request;
-            Response response;
+            Response response = null;
 
             boolean alive = true;
             FileDownloader fd = new FileDownloader();
@@ -41,10 +58,14 @@ public class ServerThread extends Thread{
             while(alive){
 
                 request = (Request) ois.readObject();
+                log.fine(String.format("Request: Username: %s\nmessage: %s\ntype: %s\n",
+                        request.getUserName(), request.getMessage(), request.getType().toString()));
+
 
                 if(authenticated){
                     if(request.isFinish()){
                         finish();
+                        // TODO: set response to be yeah I finish now
                         alive = false;
                     }else if(request.isRequest()){
                         // TODO: Decrypt fileName
@@ -52,22 +73,28 @@ public class ServerThread extends Thread{
                         String fileName = request.getMessage();
                         response = fd.getFileResponse(fileName);
 
-
                     } else if(request.isAuthenticate()){
                         /*
                         TODO: Should we tell the user they've already authenticated or should we try to log on as the
                         new user
                          */
+                        // TODO: at least send user some response
+
                     }else{
                         // TODO: Ask user what the hell that was, this shouldn't be possible as type is enum
                     }
                 }else{
                     authenticated = authorize(request);
                     if(authenticated){
-                        // User successfully authenticated, let them know this
-                        // TODO: Acknowledge users authentication
+                        // Send user okay
+                        response = new Response(Response.OK, Response.AUTHORIZED_MESSAGE);
+                    }else{
+                        log.fine(String.format("User: %s didn't authenticate", request.getUserName()));
+                        // Send them oh no
+                        response = new Response(Response.UNAUTHORIZED, Response.UNAUTHORIZED_MESSAGE);
                     }
                 }
+                sendResponse(response);
             }
 
             ois.close();
@@ -85,7 +112,7 @@ public class ServerThread extends Thread{
             oos.writeObject(r);
 
         }catch(IOException e){
-            System.out.println("Error sending response");
+            log.severe("IO error when sending response\n" + e.getMessage());
         }
     }
 
@@ -99,7 +126,12 @@ public class ServerThread extends Thread{
             return false;
         }
 
-        // Check if body matches what it should be
+        // TODO: Check decrypt message first
+        if(this.users.containsKey(r.getUserName())){
+            return true;
+        }
+
+
         return false;
     }
 

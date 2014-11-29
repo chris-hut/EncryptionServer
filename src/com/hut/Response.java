@@ -1,13 +1,18 @@
 package com.hut;
 
+import java.io.Serializable;
+
 /**
  * A Response from a server
  */
-public class Response {
+public class Response implements Serializable{
 
-    public final static String UNAUTHORIZED_STRING = "you can't see that";
+    private final static long serialVersionUID = 4815162342L;
+
+    public final static String UNAUTHORIZED_MESSAGE = "you can't see that";
     public final static String NOT_FOUND_MESSAGE = "can't help you here";
     public final static String SERVER_ERROR_MESSAGE = "something broke on our end";
+    public final static String AUTHORIZED_MESSAGE = "you got some good credentials";
 
     public final static int OK = 200;
     public final static int UNAUTHORIZED = 401;

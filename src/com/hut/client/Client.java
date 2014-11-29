@@ -8,11 +8,14 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.*;
 
 /**
  * Client class
  */
 public class Client {
+
+    private static final Logger log = Logger.getLogger(Client.class.getName());
 
     private String userName;
     private String key;
@@ -26,6 +29,19 @@ public class Client {
         this.userName = userName;
         this.key = key;
         this.hostName = hostName;
+
+        setupLogger();
+    }
+
+    private void setupLogger(){
+        try{
+            Handler fh = new FileHandler("./client.log");
+            log.addHandler(fh);
+            fh.setFormatter(new SimpleFormatter());
+        }catch(IOException e){
+            // error setting up logging
+        }
+        log.setLevel(Level.FINEST);
     }
 
     /**
@@ -44,23 +60,30 @@ public class Client {
             Request request = new Request(encryptedUsername, Request.AUTHENTICATE, Request.TYPE.AUTHENTICATE);
 
             System.out.println("Authenticating, waiting for server response");
+            log.fine("Authenticating with server");
 
             Response response = sendRequest(request);
 
             if(response == null){
                 System.out.println("No response from server.");
+                log.fine("No response from server");
                 return false;
             }
+
+            log.fine(String.format("Response from server: StatusCode: %d\nMessage: %s",
+                    response.getStatusCode(), response.getMessage()));
 
             if(response.getStatusCode() == 200){
                 // Successfully authenticated
                 // TODO: Check other parameters of response
                 System.out.println("Successfully connected to server");
+                log.fine("Connected to server");
                 return true;
             }
 
         }catch(IOException e){
             System.out.println("Error connecting to server");
+            log.severe("Error connecting to server\n" + e.getMessage());
         }
 
         return false;
@@ -91,8 +114,10 @@ public class Client {
             response = (Response) objectInputStream.readObject();
         }catch(IOException e){
             System.out.println("Error sending request");
+            log.fine("Error sending request/n" + e.getMessage());
         }catch(ClassNotFoundException e){
             System.out.println("Error getting response");
+            log.fine("Error receiving response/n" + e.getMessage());
         }
 
         return response;
@@ -106,9 +131,9 @@ public class Client {
         Response response = sendRequest(request);
 
         if(response.getStatusCode() == 200){
-            System.out.println("Server closed successfully.");
+            log.fine("Server closed successfully");
         }else{
-            System.out.println("Error closing server");
+            log.fine("Error closing server");
         }
 
         try{

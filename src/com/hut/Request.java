@@ -1,9 +1,13 @@
 package com.hut;
 
+import java.io.Serializable;
+
 /**
  * Request class modelling a request to be sent from a client to its server
  */
-public class Request {
+public class Request implements Serializable{
+
+    private final static long serialVersionUID = 108l;
 
     public final static String AUTHENTICATE = "authenticate me please";
     public final static String FINISH = "please go away";

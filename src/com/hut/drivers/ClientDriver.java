@@ -32,9 +32,17 @@ public class ClientDriver {
         String input = null;
         Response response = null;
         do{
+            System.out.print("> ");
+            // Not trimming file name since files can have whitespace in them
             input = s.nextLine();
             if(invalidFileNameInput(input)){
                 System.out.println(String.format("Invalid input: %s", input));
+                displayHelp();
+                continue;
+            }
+
+            if(input.equalsIgnoreCase("help")){
+                displayHelp();
                 continue;
             }
 
@@ -74,7 +82,7 @@ public class ClientDriver {
             } else{
                 // Not sure what this means ehh
             }
-        } while(input.equalsIgnoreCase(EXIT_STRING));
+        } while(!input.equalsIgnoreCase(EXIT_STRING));
     }
 
     /**
@@ -89,6 +97,7 @@ public class ClientDriver {
         }
 
         if(input.trim().length() == 0){
+            // file was all whitespace
             return true;
         }
 
@@ -102,6 +111,15 @@ public class ClientDriver {
         if(args.length != 3){
             invalidArguments();
         }
+    }
+
+    /**
+     * Displays help information about how to get files from
+     */
+    public static void displayHelp(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Enter name of file to receive from server or help for this text");
+        System.out.println(sb.toString());
     }
 
     /**
