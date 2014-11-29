@@ -3,10 +3,7 @@ package com.hut.client;
 import com.hut.Request;
 import com.hut.Response;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.logging.*;
 
@@ -24,6 +21,7 @@ public class Client {
     private ObjectOutputStream oos;
     private InputStream inputStream;
     private ObjectInputStream objectInputStream;
+    private Handler fh;
 
     public Client(String hostName, String userName, String key){
         this.userName = userName;
@@ -35,7 +33,8 @@ public class Client {
 
     private void setupLogger(){
         try{
-            Handler fh = new FileHandler("./client.log");
+            new File("./logs").mkdir();
+            fh = new FileHandler("logs/client.log");
             log.addHandler(fh);
             fh.setFormatter(new SimpleFormatter());
         }catch(IOException e){
@@ -142,6 +141,10 @@ public class Client {
             objectInputStream.close();
         }catch(IOException e){
             // Error closing file
+        }
+
+        if(fh != null){
+            fh.close();
         }
     }
 

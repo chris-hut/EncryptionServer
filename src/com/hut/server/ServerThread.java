@@ -4,6 +4,7 @@ import com.hut.Request;
 import com.hut.Response;
 import com.hut.util.FileDownloader;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -23,6 +24,7 @@ public class ServerThread extends Thread{
     private boolean authenticated = false;
     private String user = null;
     private ObjectOutputStream oos = null;
+    private Handler fh;
 
     public ServerThread(Socket socket, HashMap<String, String> users){
         super("ServerThread");
@@ -34,8 +36,8 @@ public class ServerThread extends Thread{
 
     private void setupLogger(){
         try{
-
-            Handler fh = new FileHandler("server_thread.log");
+            new File("./logs").mkdir();
+            fh = new FileHandler("logs/server_thread.log");
             log.addHandler(fh);
             fh.setFormatter(new SimpleFormatter());
         }catch(IOException e){
@@ -139,6 +141,10 @@ public class ServerThread extends Thread{
      * Cleans up nicely
      */
     public void finish(){
+
+        if(fh != null){
+            fh.close();
+        }
 
     }
 
