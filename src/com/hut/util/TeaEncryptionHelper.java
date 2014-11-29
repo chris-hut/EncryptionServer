@@ -48,13 +48,16 @@ public class TeaEncryptionHelper {
 
         IntBuffer ib = ByteBuffer.wrap(padded).asIntBuffer();
 
-        int[] buf = ib.array();
+        int[] buf = new int[size];
+        for(int i = 0; i < buf.length; i++){
+            buf[i] = ib.get();
+        }
 
 
         // Cycle two ints in array
         int[] cipherText  = new int[2];
         int[] fullCipher;
-        if(buf.length % 2 == 0){
+        if(buf.length % 2 > 0){
             fullCipher = new int[buf.length + 1];
         }else {
             fullCipher = new int[buf.length];
@@ -63,7 +66,7 @@ public class TeaEncryptionHelper {
         IntBuffer anotherIB = IntBuffer.wrap(fullCipher);
 
         for(int i = 0; i < buf.length; i +=2){
-            cipherText[i] = buf[i];
+            cipherText[0] = buf[i];
             if(i < buf.length-1){
                 cipherText[1] = buf[i+1];
             }else{
@@ -74,7 +77,7 @@ public class TeaEncryptionHelper {
             anotherIB.put(cipherText);
         }
 
-        ByteBuffer result = ByteBuffer.allocate(fullCipher.length + 4);
+        ByteBuffer result = ByteBuffer.allocate(fullCipher.length*4);
         IntBuffer intBuffer = result.asIntBuffer();
         intBuffer.put(fullCipher);
         return result.array();

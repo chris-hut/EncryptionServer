@@ -38,4 +38,10 @@ public class Response implements Serializable{
         return message;
     }
 
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Statuscode: ").append(this.statusCode).append(" message: ").append(message);
+        return sb.toString();
+    }
+
 }

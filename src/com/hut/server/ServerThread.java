@@ -68,8 +68,7 @@ public class ServerThread extends Thread{
                     request = decryptRequest(unencryptedRequest);
                     // TODO: check if can't decrypt properly
 
-                    log.fine(String.format("Request: Username: %s\nmessage: %s\ntype: %s\n",
-                            request.getUserName(), request.getMessage(), request.getType().toString()));
+                    log.fine("Request: " + request.toString());
 
                     if(request.isFinish()){
                         finish();
@@ -127,17 +126,22 @@ public class ServerThread extends Thread{
     }
 
     private Response encryptResponse(Response unencryptedResponse){
-        return new Response(
-            // TODO: Should statusCode be encrypted
-            // I say it shouldn't otherwise client will not be able to understand that it wasn't able to authenticate
-            unencryptedResponse.getStatusCode(),
-            new String(this.encryptionHelper.encrypt(unencryptedResponse.getMessage()))
-        );
+        log.fine("Sending response: " + unencryptedResponse.toString());
+        if(this.encryptionHelper == null){
+            // If user didn't authenticate, return an unencrypted response
+            return unencryptedResponse;
+        }else{
+            return new Response(
+                // TODO: Should statusCode be encrypted
+                // I say it shouldn't otherwise client will not be able to understand that it wasn't able to authenticate
+                unencryptedResponse.getStatusCode(),
+                new String(this.encryptionHelper.encrypt(unencryptedResponse.getMessage()))
+            );
+        }
     }
 
     private Request decryptRequest(Request encryptedRequest){
         return new Request(
-                this.encryptionHelper.decryptString(encryptedRequest.getUserName()),
                 this.encryptionHelper.decryptString(encryptedRequest.getMessage()),
                 // TODO: Should type be encrypted?
                 encryptedRequest.getType()
@@ -151,6 +155,7 @@ public class ServerThread extends Thread{
      */
     private boolean authorize(Request r){
         if(!r.isAuthenticate()){
+            log.fine("User sent request without first authenticating");
             return false;
         }
 
@@ -162,9 +167,12 @@ public class ServerThread extends Thread{
                 // We have a match
                 this.userName = userName;
                 this.encryptionHelper = th;
+                log.fine(String.format("User: %s authenticated successfully", userName));
                 return true;
             }
         }
+
+        log.fine(String.format("User provided invalid authentication"));
 
         return false;
     }

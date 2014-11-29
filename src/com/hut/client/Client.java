@@ -58,8 +58,7 @@ public class Client {
             this.inputStream = socket.getInputStream();
             this.objectInputStream = new ObjectInputStream(this.inputStream);
 
-            String encryptedUsername = userName;
-            Request request = new Request(encryptedUsername, Request.AUTHENTICATE, Request.TYPE.AUTHENTICATE);
+            Request request = new Request(Request.AUTHENTICATE, Request.TYPE.AUTHENTICATE);
 
             System.out.println("Authenticating, waiting for server response");
             log.fine("Authenticating with server");
@@ -99,7 +98,7 @@ public class Client {
     public Response requestFile(String fileName){
         String encryptedMessage = fileName;
 
-        return sendRequest(new Request(userName, encryptedMessage, Request.TYPE.REQUEST_FILE));
+        return sendRequest(new Request(encryptedMessage, Request.TYPE.REQUEST_FILE));
     }
 
 
@@ -111,9 +110,14 @@ public class Client {
     private Response sendRequest(Request r){
         Response response = null;
         try{
-            oos.writeObject(r);
+            log.fine("Sending request: " + r.toString());
 
-            response = (Response) objectInputStream.readObject();
+            Request encryptedRequest = encryptRequest(r);
+
+            oos.writeObject(encryptedRequest);
+
+            response = decryptResponse((Response) objectInputStream.readObject());
+            log.fine("Received response: " + response.toString());
         }catch(IOException e){
             System.out.println("Error sending request");
             log.fine("Error sending request/n" + e.getMessage());
@@ -127,7 +131,6 @@ public class Client {
 
     private Request encryptRequest(Request r){
         return new Request(
-            new String(this.encryptionHelper.encrypt(r.getUserName())),
             new String(this.encryptionHelper.encrypt(r.getMessage())),
             r.getType()
         );
@@ -144,7 +147,7 @@ public class Client {
      * Closes connection with server
      */
     public void finishConnection(){
-        Request request = new Request(userName, Request.FINISH, Request.TYPE.FINISH);
+        Request request = new Request(Request.FINISH, Request.TYPE.FINISH);
         Response response = sendRequest(request);
 
         if(response.getStatusCode() == 200){

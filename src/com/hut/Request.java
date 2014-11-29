@@ -12,7 +12,6 @@ public class Request implements Serializable{
     public final static String AUTHENTICATE = "authenticate me please";
     public final static String FINISH = "please go away";
 
-    private String userName;
     private String message;
     private TYPE type;
 
@@ -20,8 +19,7 @@ public class Request implements Serializable{
       AUTHENTICATE, REQUEST_FILE, FINISH
     };
 
-    public Request(String userName, String message, TYPE type){
-        this.userName = userName;
+    public Request(String message, TYPE type){
         this.message = message;
         this.type = type;
     }
@@ -38,15 +36,18 @@ public class Request implements Serializable{
         return type == TYPE.FINISH;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
     public String getMessage() {
         return message;
     }
 
     public TYPE getType() {
         return type;
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(" message: ").append(this.message)
+                .append(" type: ").append(this.type.toString());
+        return sb.toString();
     }
 }
