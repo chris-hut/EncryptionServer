@@ -18,7 +18,7 @@ public class FileDownloader {
                 sb.append(fileName + "\n");
                 String line = br.readLine();
                 while(line != null){
-                    sb.append(line + "\n");
+                    sb.append(line).append("\n");
                     line = br.readLine();
                 }
 

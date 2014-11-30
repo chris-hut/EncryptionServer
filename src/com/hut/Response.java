@@ -19,8 +19,8 @@ public class Response implements Serializable{
     public final static int NOT_FOUND = 404;
     public final static int SERVER_ERROR = 500;
 
-    private int statusCode;
-    private String message;
+    private final int statusCode;
+    private final String message;
 
 
     public Response(int statusCode, String message){
@@ -39,9 +39,7 @@ public class Response implements Serializable{
     }
 
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Statuscode: ").append(this.statusCode).append(" message: ").append(message);
-        return sb.toString();
+        return "Statuscode: " + this.statusCode + " message: " + message;
     }
 
 }

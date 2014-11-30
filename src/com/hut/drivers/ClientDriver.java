@@ -14,7 +14,7 @@ import java.util.Scanner;
  */
 public class ClientDriver {
 
-    public static final String EXIT_STRING = "exit";
+    private static final String EXIT_STRING = "exit";
 
     public static void main(String args[]){
         validateArguments(args);
@@ -29,7 +29,7 @@ public class ClientDriver {
         }
 
         Scanner s = new Scanner(System.in);
-        String input = null;
+        String input;
         Response response = null;
         do{
             System.out.print("> ");
@@ -91,23 +91,19 @@ public class ClientDriver {
      * @param input the users input
      * @return true if input is invalid
      */
-    public static boolean invalidFileNameInput(String input){
+    private static boolean invalidFileNameInput(String input){
         if(input.length() == 0){
             return true;
         }
 
-        if(input.trim().length() == 0){
-            // file was all whitespace
-            return true;
-        }
+        return input.trim().length() == 0;
 
-        return false;
     }
 
     /**
      * Validates the arguments of the program and calls invalidArguments if
      * arguments are invalid*/
-    public static void validateArguments(String args[]){
+    private static void validateArguments(String args[]){
         if(args.length != 3){
             invalidArguments();
         }
@@ -116,16 +112,14 @@ public class ClientDriver {
     /**
      * Displays help information about how to get files from
      */
-    public static void displayHelp(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Enter name of file to receive from server or help for this text");
-        System.out.println(sb.toString());
+    private static void displayHelp(){
+        System.out.println("Enter name of file to receive from server or help for this text");
     }
 
     /**
      * Called if arguments are invalid, exits the program after displaying usage message.
      */
-    public static void invalidArguments(){
+    private static void invalidArguments(){
         System.err.println("usage: java ClientDriver <host_name> <user_name> <user_key>");
         System.err.println("\thost_name: the name of the host (server)");
         System.err.println("\tuser_name: the name of the user");

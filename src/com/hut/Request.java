@@ -9,15 +9,14 @@ public class Request implements Serializable{
 
     private final static long serialVersionUID = 108l;
 
-    public final static String AUTHENTICATE = "authenticate me please";
     public final static String FINISH = "please go away";
 
-    private String message;
-    private TYPE type;
+    private final String message;
+    private final TYPE type;
 
     public enum TYPE{
       AUTHENTICATE, REQUEST_FILE, FINISH
-    };
+    }
 
     public Request(String message, TYPE type){
         this.message = message;
@@ -45,9 +44,6 @@ public class Request implements Serializable{
     }
 
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Message: ").append(this.message)
-                .append(" type: ").append(this.type.toString());
-        return sb.toString();
+        return "Message: " + this.message + " type: " + this.type.toString();
     }
 }

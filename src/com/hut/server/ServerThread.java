@@ -20,10 +20,9 @@ public class ServerThread extends Thread{
 
     private static final Logger log = Logger.getLogger(ServerThread.class.getName());
 
-    private HashMap<String, String> users;
-    private Socket socket;
+    private final HashMap<String, String> users;
+    private final Socket socket;
     private boolean authenticated = false;
-    private String userName = null;
     private ObjectOutputStream oos = null;
     private Handler fh;
     private TeaEncryptionHelper encryptionHelper = null;
@@ -39,6 +38,7 @@ public class ServerThread extends Thread{
     private void setupLogger(){
         try{
             // Hack to put logs in log folder
+            //noinspection ResultOfMethodCallIgnored
             new File("./logs").mkdir();
             fh = new FileHandler("logs/server_thread.log");
             log.addHandler(fh);
@@ -165,7 +165,7 @@ public class ServerThread extends Thread{
             String userName = th.decryptString(r.getMessage());
             if(this.users.containsKey(userName)){
                 // We have a match
-                this.userName = userName;
+                String userName1 = userName;
                 this.encryptionHelper = th;
                 log.fine(String.format("User: %s authenticated successfully", userName));
                 return true;

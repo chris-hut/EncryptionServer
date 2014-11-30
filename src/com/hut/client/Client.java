@@ -15,19 +15,16 @@ public class Client {
 
     private static final Logger log = Logger.getLogger(Client.class.getName());
 
-    private String userName;
-    private String key;
-    private String hostName;
-    private Socket socket;
+    private final String userName;
+    private final String hostName;
     private ObjectOutputStream oos;
     private InputStream inputStream;
     private ObjectInputStream objectInputStream;
     private Handler fh;
-    private TeaEncryptionHelper encryptionHelper;
+    private final TeaEncryptionHelper encryptionHelper;
 
     public Client(String hostName, String userName, String key){
         this.userName = userName;
-        this.key = key;
         this.hostName = hostName;
         encryptionHelper = new TeaEncryptionHelper(key);
 
@@ -37,6 +34,7 @@ public class Client {
     private void setupLogger(){
         try{
             // Hack to put logs in log folder
+            //noinspection ResultOfMethodCallIgnored
             new File("./logs").mkdir();
             fh = new FileHandler("logs/client.log");
             log.addHandler(fh);
@@ -54,8 +52,8 @@ public class Client {
      */
     public boolean connectToServer(int portNumber){
         try{
-            this.socket = new Socket(hostName, portNumber);
-            this.oos = new ObjectOutputStream(this.socket.getOutputStream());
+            Socket socket = new Socket(hostName, portNumber);
+            this.oos = new ObjectOutputStream(socket.getOutputStream());
             this.inputStream = socket.getInputStream();
             this.objectInputStream = new ObjectInputStream(this.inputStream);
 
@@ -94,9 +92,8 @@ public class Client {
      * @return Response from server
      */
     public Response requestFile(String fileName){
-        String encryptedMessage = fileName;
 
-        return sendRequest(new Request(encryptedMessage, Request.TYPE.REQUEST_FILE));
+        return sendRequest(new Request(fileName, Request.TYPE.REQUEST_FILE));
     }
 
 
@@ -173,7 +170,4 @@ public class Client {
     }
 
 
-    public String getUserName(){
-        return userName;
-    }
 }

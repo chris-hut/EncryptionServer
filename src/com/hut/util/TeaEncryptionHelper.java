@@ -2,23 +2,18 @@ package com.hut.util;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
-/**
- * Created by chris on 11/26/14.
- */
 public class TeaEncryptionHelper {
 
-    private int[] key;
+    private final int[] key;
 
     public TeaEncryptionHelper(String key){
         this(key.getBytes());
     }
 
-    public TeaEncryptionHelper(byte[] key){
+    private TeaEncryptionHelper(byte[] key){
         //System.out.println(System.getProperty("java.library.path"));
         // TODO: catch the not linked error and output an informational message before closing
         System.loadLibrary("tea_encryption_helper");
@@ -123,4 +118,30 @@ public class TeaEncryptionHelper {
     public native void cEncrypt(int[] v, int[] k);
 
     public native void cDecrypt(int[] v, int[] k);
+
+
+    /**
+     * Simple test since JNI hates junit
+     * @param args
+     */
+    public static void main(String args[]){
+        TeaEncryptionHelper th = new TeaEncryptionHelper("windows 98 is nice");
+        String text = "And who are you the proud lord said that I must bow so low";
+        byte[] encryptedText = th.encrypt(text);
+        byte[] encryptedAgain = th.encrypt(text);
+        if(encryptedText != encryptedAgain){
+            System.out.println("Encrypting same thing twice yielded different results");
+        }
+        System.out.println(String.format("Decrypted: %s", new String(encryptedText)));
+        System.out.println(String.format("Decrypted again: %s", new String(encryptedAgain)));
+        String decrypted = th.decryptString(encryptedText);
+        String decryptedAgain = th.decryptString(encryptedAgain);
+        if(!text.equals(decrypted)){
+            System.out.println("Decrypted test doesn't equal original");
+        }
+        if(!text.equals(decryptedAgain)){
+            System.out.println("Decrypted again text doesn't equal original");
+        }
+        System.out.println(String.format("Original: %s\nDecrypted: %s\n Decrypted again: %s",text, decrypted, decryptedAgain));
+    }
 }

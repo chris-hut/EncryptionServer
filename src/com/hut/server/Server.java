@@ -12,9 +12,9 @@ import java.util.List;
 public class Server {
 
     private HashMap<String, String> users = new HashMap<String, String>();
-    private int portNumber;
+    private final int portNumber;
     private boolean alive = true;
-    private List<ServerThread> threads;
+    private final List<ServerThread> threads;
 
     public Server(int portNumber, HashMap<String, String> users){
         this.users = users;
@@ -33,7 +33,7 @@ public class Server {
      */
     public void serve(){
         ServerSocket socket = null;
-        ServerThread thread = null;
+        ServerThread thread;
         try{
             socket = new ServerSocket(this.portNumber);
 
@@ -65,7 +65,7 @@ public class Server {
 
     /**
      * Closes the server*/
-    public void close(){
+    void close(){
         /*
         TODO: Find a better way to close the server, since ServerSocket.accept() will block
         until a connection is made, this /might/ make it throw a IOException causing us to leave the loop
