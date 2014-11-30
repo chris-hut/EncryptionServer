@@ -59,7 +59,7 @@ public class Client {
             this.inputStream = socket.getInputStream();
             this.objectInputStream = new ObjectInputStream(this.inputStream);
 
-            Request request = new Request(Request.AUTHENTICATE, Request.TYPE.AUTHENTICATE);
+            Request request = new Request(this.userName, Request.TYPE.AUTHENTICATE);
 
             System.out.println("Authenticating, waiting for server response");
             log.fine("Authenticating with server");
@@ -118,7 +118,7 @@ public class Client {
             log.fine("Received response: " + response.toString());
         }catch(IOException e){
             System.out.println("Error sending request");
-            log.fine("Error sending request/n" + e.getMessage());
+            log.fine("Error sending request" + e.getMessage());
         }catch(ClassNotFoundException e){
             System.out.println("Error getting response");
             log.fine("Error receiving response/n" + e.getMessage());
