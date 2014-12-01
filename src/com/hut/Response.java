@@ -14,6 +14,7 @@ public class Response implements Serializable{
     public final static String SERVER_ERROR_MESSAGE = "something broke on our end";
     public final static String AUTHORIZED_MESSAGE = "you got some good credentials";
     public final static String FILE_TOO_LARGE_MESSAGE = "file was too large";
+    public final static String CLOSING_SERVER_MESSAGE = "closing server now";
 
     public final static int OK = 200;
     public final static int UNAUTHORIZED = 401;

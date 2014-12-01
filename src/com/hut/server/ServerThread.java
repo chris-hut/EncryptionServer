@@ -24,6 +24,7 @@ public class ServerThread extends Thread{
     private final Socket socket;
     private boolean authenticated = false;
     private ObjectOutputStream oos = null;
+    private ObjectInputStream ois = null;
     private Handler fh;
     private TeaEncryptionHelper encryptionHelper = null;
 
@@ -51,7 +52,7 @@ public class ServerThread extends Thread{
 
     public void run(){
         try{
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            ois = new ObjectInputStream(socket.getInputStream());
             oos = new ObjectOutputStream(socket.getOutputStream());
 
             Request request;
@@ -72,8 +73,8 @@ public class ServerThread extends Thread{
                     log.fine("Request: " + request.toString());
 
                     if(request.isFinish()){
-                        finish();
-                        // TODO: set response to be yeah I finish now
+                        response = new Response(Response.OK, Response.CLOSING_SERVER_MESSAGE.getBytes());
+                        // Finish is called once loop ends
                         alive = false;
                     }else if(request.isRequest()){
                         // TODO: Decrypt fileName
@@ -104,9 +105,6 @@ public class ServerThread extends Thread{
                 sendResponse(response);
             }
 
-            log.fine("Closing server");
-            ois.close();
-            oos.close();
             finish();
         }catch(IOException e){
 
@@ -121,7 +119,12 @@ public class ServerThread extends Thread{
             oos.writeObject(encryptResponse(r));
 
         }catch(IOException e){
-            log.severe("IO error when sending response\n" + e.getMessage());
+            // User probably disconnected
+            log.info("IO error when sending response, user has likely disconnected");
+            // From: http://stackoverflow.com/a/1181325/1684866
+            // Once received this, socket is now useless so lets close up everything
+            System.out.println("Client has disconnected");
+            finish();
         }
     }
 
@@ -180,11 +183,26 @@ public class ServerThread extends Thread{
      * Cleans up nicely
      */
     public void finish(){
-        /*TODO This can be called from Server class to kill all threads, proper cleanup should be done here WRT
-            the streams and possibly sending client a goodbye message
-         */
+        System.out.println("Closing server thread");
         if(fh != null){
             fh.close();
+        }
+        if(oos != null){
+            try{
+                oos.close();
+            }catch(IOException e){}
+        }
+
+        if(ois != null){
+            try{
+                ois.close();
+            }catch(IOException e){}
+        }
+
+        if(socket != null){
+            try{
+                socket.close();
+            }catch(IOException e){}
         }
 
     }

@@ -48,14 +48,18 @@ public class ClientDriver {
             }
 
             if(input.equalsIgnoreCase("exit")){
-                client.finishConnection();
+                if(client.finishConnection()){
+                    System.out.println("Server closed successfully");
+                }else{
+                    // Do we even want to say anything here?
+                }
                 break;
             }
 
             response = client.requestFile(input);
 
             if(response == null){
-                System.err.println("Null response from server...");
+                System.err.println("No response from server");
                 continue;
             }
 

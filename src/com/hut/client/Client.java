@@ -146,13 +146,15 @@ public class Client {
     /**
      * Closes connection with server
      */
-    public void finishConnection(){
+    public boolean finishConnection(){
         Request request = new Request(Request.FINISH.getBytes(), Request.TYPE.FINISH);
         Response response = sendRequest(request);
+        boolean returnValue = false;
 
-        if(response != null){
+        if(response == null){
             log.fine("No response from server");
-        }else if(response.getStatusCode() == 200){
+        }else if(response.getStatusCode() == Response.OK){
+            returnValue = true;
             log.fine("Server closed successfully");
         }else{
             log.fine("Error closing server");
@@ -169,6 +171,7 @@ public class Client {
         if(fh != null){
             fh.close();
         }
+        return returnValue;
     }
 
 
