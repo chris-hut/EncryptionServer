@@ -36,10 +36,13 @@ public class FileDownloader {
                 // Shouldn't happen as we just checked if file exists
             }catch(IOException e){
 
+            }catch(OutOfMemoryError e){
+                // File is too big to transfer
+                response = new Response(Response.FILE_TOO_LARGE, Response.FILE_TOO_LARGE_MESSAGE.getBytes());
             }
         }else{
             // File doesn't exist, return not found response
-            response = new Response(404, Response.NOT_FOUND_MESSAGE.getBytes());
+            response = new Response(Response.FILE_NOT_FOUND, Response.FILE_NOT_FOUND_MESSAGE.getBytes());
         }
         return response;
     }

@@ -59,7 +59,7 @@ public class ClientDriver {
                 continue;
             }
 
-            if(response.getStatusCode() == 200){
+            if(response.getStatusCode() == Response.OK){
                 // response is good we'll get the file
                 // TODO: Put this in FileDownloader
                 String[] fileInfo = response.getMessageString().split("\n");
@@ -84,9 +84,12 @@ public class ClientDriver {
                     System.out.println("Error creating file: " + fileName);
                     e.printStackTrace();
                 }
-            }else if(response.getStatusCode() == 404){
+            }else if(response.getStatusCode() == Response.FILE_NOT_FOUND){
                 // File doesn't exist
                 System.out.println(String.format("File: %s doesn't exist", input));
+            } else if(response.getStatusCode() == Response.FILE_TOO_LARGE){
+                // File was too large to transfer
+                System.out.println(String.format("File: %s was too large to transfer", input));
             } else{
                 // Not sure what this means ehh
             }
