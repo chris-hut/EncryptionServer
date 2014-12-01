@@ -12,15 +12,21 @@ public class FileDownloader {
     public Response getFileResponse(String fileName){
         Response response = null;
         System.out.println("Looking for file: " + fileName);
-        if(new File(fileName).exists()){
+        File f = new File(fileName);
+        // TODO: Do something nicer if dealing with directory
+        if(f.exists() && f.isFile()){
             try{
                 BufferedReader br = new BufferedReader(new FileReader(fileName));
                 StringBuilder sb = new StringBuilder();
-                sb.append(fileName + "\n");
-                String line = br.readLine();
-                while(line != null){
-                    sb.append(line).append("\n");
-                    line = br.readLine();
+                sb.append(fileName);
+                // Don't want anything added for empty files
+                if(f.length() > 0){
+                    sb.append("\n");
+                    String line = br.readLine();
+                    while(line != null){
+                        sb.append(line).append("\n");
+                        line = br.readLine();
+                    }
                 }
 
                 // TODO: Encode response message

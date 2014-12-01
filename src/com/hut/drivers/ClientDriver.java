@@ -6,6 +6,7 @@ import com.hut.client.Client;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -64,17 +65,24 @@ public class ClientDriver {
                 String[] fileInfo = response.getMessageString().split("\n");
                 String fileName = fileInfo[0];
                 try{
+                    // TODO: Overwrite?
                     File file = new File(fileName);
-                    PrintWriter pw = new PrintWriter(file);
-                    System.out.println("Downloading file...");
-                    for(int i = 1; i < fileInfo.length; i++){
-                        // TODO: Fancy download animation
-                        pw.println(fileInfo[i]);
-                    }
-                    pw.close();
+                    // Blank file, don't want to add anything to it
+                        PrintWriter pw = new PrintWriter(file);
+                        System.out.println("Downloading file...");
+                        pw.print("");
+                        for(int i = 1; i < fileInfo.length; i++){
+                            // TODO: Fancy download animation
+                            pw.println(fileInfo[i]);
+                        }
+                        pw.close();
                     System.out.println(String.format("File: %s download complete", fileName));
                 }catch(FileNotFoundException e){
-
+                    System.out.println("File was not found");
+                    e.printStackTrace();
+                }catch(IOException e){
+                    System.out.println("Error creating file: " + fileName);
+                    e.printStackTrace();
                 }
             }else if(response.getStatusCode() == 404){
                 // File doesn't exist

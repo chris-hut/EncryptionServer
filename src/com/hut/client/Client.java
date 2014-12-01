@@ -109,14 +109,6 @@ public class Client {
 
             Request encryptedRequest = encryptRequest(r);
 
-            // Sanity check
-            String decryptedMessage = this.encryptionHelper.decryptString(encryptedRequest.getMessage());
-            if(!decryptedMessage.equals(r.getMessageString())){
-                System.out.println("Sanity Check failed, decrypted string is different");
-            }else{
-                System.out.println("Back in the nineties I was on a very famous TV show");
-            }
-
             oos.writeObject(encryptedRequest);
 
             response = decryptResponse((Response) objectInputStream.readObject());
