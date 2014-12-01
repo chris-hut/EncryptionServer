@@ -78,7 +78,7 @@ public class ServerThread extends Thread{
                     }else if(request.isRequest()){
                         // TODO: Decrypt fileName
 
-                        String fileName = request.getMessage();
+                        String fileName = new String(request.getMessage());
                         response = fd.getFileResponse(fileName);
 
                     } else if(request.isAuthenticate()){
@@ -95,10 +95,10 @@ public class ServerThread extends Thread{
                     authenticated = authorize(unencryptedRequest);
                     if(authenticated){
                         // Send user okay
-                        response = new Response(Response.OK, Response.AUTHORIZED_MESSAGE);
+                        response = new Response(Response.OK, Response.AUTHORIZED_MESSAGE.getBytes());
                     }else{
                         // Send them oh no
-                        response = new Response(Response.UNAUTHORIZED, Response.UNAUTHORIZED_MESSAGE);
+                        response = new Response(Response.UNAUTHORIZED, Response.UNAUTHORIZED_MESSAGE.getBytes());
                     }
                 }
                 sendResponse(response);
@@ -135,14 +135,14 @@ public class ServerThread extends Thread{
                 // TODO: Should statusCode be encrypted
                 // I say it shouldn't otherwise client will not be able to understand that it wasn't able to authenticate
                 unencryptedResponse.getStatusCode(),
-                new String(this.encryptionHelper.encrypt(unencryptedResponse.getMessage()))
+                this.encryptionHelper.encrypt(unencryptedResponse.getMessage())
             );
         }
     }
 
     private Request decryptRequest(Request encryptedRequest){
         return new Request(
-                this.encryptionHelper.decryptString(encryptedRequest.getMessage()),
+                this.encryptionHelper.decrypt(encryptedRequest.getMessage()),
                 // TODO: Should type be encrypted?
                 encryptedRequest.getType()
         );

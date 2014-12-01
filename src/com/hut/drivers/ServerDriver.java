@@ -22,7 +22,7 @@ public class ServerDriver {
     }
 
     private static void initializeUsers(){
-        users.put("john_locke", "4815162342");
+        users.put("john_locke", "4815162342108lost");
         users.put("jack_shepard", "we_have_to_go_back");
     }
 }

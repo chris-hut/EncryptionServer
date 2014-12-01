@@ -57,7 +57,7 @@ public class Client {
             this.inputStream = socket.getInputStream();
             this.objectInputStream = new ObjectInputStream(this.inputStream);
 
-            Request request = new Request(this.userName, Request.TYPE.AUTHENTICATE);
+            Request request = new Request(this.userName.getBytes(), Request.TYPE.AUTHENTICATE);
 
             System.out.println("Authenticating, waiting for server response");
             log.fine("Authenticating with server");
@@ -93,7 +93,7 @@ public class Client {
      */
     public Response requestFile(String fileName){
 
-        return sendRequest(new Request(fileName, Request.TYPE.REQUEST_FILE));
+        return sendRequest(new Request(fileName.getBytes(), Request.TYPE.REQUEST_FILE));
     }
 
 
@@ -108,6 +108,14 @@ public class Client {
             log.fine("Sending request: " + r.toString());
 
             Request encryptedRequest = encryptRequest(r);
+
+            // Sanity check
+            String decryptedMessage = this.encryptionHelper.decryptString(encryptedRequest.getMessage());
+            if(!decryptedMessage.equals(r.getMessageString())){
+                System.out.println("Sanity Check failed, decrypted string is different");
+            }else{
+                System.out.println("Back in the nineties I was on a very famous TV show");
+            }
 
             oos.writeObject(encryptedRequest);
 
@@ -126,7 +134,7 @@ public class Client {
 
     private Request encryptRequest(Request r){
         return new Request(
-            new String(this.encryptionHelper.encrypt(r.getMessage())),
+            this.encryptionHelper.encrypt(r.getMessage()),
             r.getType()
         );
     }
@@ -138,7 +146,7 @@ public class Client {
         } else{
             return new Response(
                 r.getStatusCode(),
-               this.encryptionHelper.decryptString(r.getMessage())
+               this.encryptionHelper.decrypt(r.getMessage())
             );
         }
     }
@@ -147,10 +155,12 @@ public class Client {
      * Closes connection with server
      */
     public void finishConnection(){
-        Request request = new Request(Request.FINISH, Request.TYPE.FINISH);
+        Request request = new Request(Request.FINISH.getBytes(), Request.TYPE.FINISH);
         Response response = sendRequest(request);
 
-        if(response.getStatusCode() == 200){
+        if(response != null){
+            log.fine("No response from server");
+        }else if(response.getStatusCode() == 200){
             log.fine("Server closed successfully");
         }else{
             log.fine("Error closing server");

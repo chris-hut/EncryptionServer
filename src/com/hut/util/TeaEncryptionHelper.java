@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class TeaEncryptionHelper {
 
@@ -86,6 +87,7 @@ public class TeaEncryptionHelper {
     }
 
     public byte[] decrypt(byte[] input){
+
         IntBuffer ib = ByteBuffer.wrap(input).asIntBuffer();
         int[] cipherText = new int[ib.remaining()];
         ib.get(cipherText);
@@ -125,6 +127,27 @@ public class TeaEncryptionHelper {
      * @param args
      */
     public static void main(String args[]){
+        //simpleTest();
+        wrongKeyEncryptedTest();
+    }
+
+    private static void wrongKeyEncryptedTest(){
+        String key1 = "4815162342108lost";
+        String key2 = "we_have_to_go_back";
+        TeaEncryptionHelper th1 = new TeaEncryptionHelper(key1);
+        TeaEncryptionHelper th2 = new TeaEncryptionHelper(key2);
+
+        String text = "john_locke";
+
+        byte[] encryptedText1 = th1.encrypt(text);
+
+        String decrypted1 = th1.decryptString(encryptedText1);
+       // String decrypted2 = th2.decryptString(encryptedText1);
+
+        //System.out.println(String.format("Decrypted1: %s\nDecrypted2: %s", decrypted1, decrypted2));
+    }
+
+    private static void simpleTest(){
         TeaEncryptionHelper th = new TeaEncryptionHelper("windows 98 is nice");
         String text = "And who are you the proud lord said that I must bow so low";
         byte[] encryptedText = th.encrypt(text);
@@ -132,8 +155,6 @@ public class TeaEncryptionHelper {
         if(encryptedText != encryptedAgain){
             System.out.println("Encrypting same thing twice yielded different results");
         }
-        System.out.println(String.format("Decrypted: %s", new String(encryptedText)));
-        System.out.println(String.format("Decrypted again: %s", new String(encryptedAgain)));
         String decrypted = th.decryptString(encryptedText);
         String decryptedAgain = th.decryptString(encryptedAgain);
         if(!text.equals(decrypted)){
@@ -142,6 +163,6 @@ public class TeaEncryptionHelper {
         if(!text.equals(decryptedAgain)){
             System.out.println("Decrypted again text doesn't equal original");
         }
-        System.out.println(String.format("Original: %s\nDecrypted: %s\n Decrypted again: %s",text, decrypted, decryptedAgain));
+        System.out.println(String.format("Original: %s\nDecrypted: %s\nDecrypted again: %s",text, decrypted, decryptedAgain));
     }
 }

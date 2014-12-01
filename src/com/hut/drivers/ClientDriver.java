@@ -61,7 +61,7 @@ public class ClientDriver {
             if(response.getStatusCode() == 200){
                 // response is good we'll get the file
                 // TODO: Put this in FileDownloader
-                String[] fileInfo = response.getMessage().split("\n");
+                String[] fileInfo = response.getMessageString().split("\n");
                 String fileName = fileInfo[0];
                 try{
                     File file = new File(fileName);

@@ -24,7 +24,7 @@ public class FileDownloader {
 
                 // TODO: Encode response message
                 String encodedResponse = sb.toString();
-                response = new Response(200, encodedResponse);
+                response = new Response(200, encodedResponse.getBytes());
             }catch(FileNotFoundException e){
                 // Shouldn't happen as we just checked if file exists
             }catch(IOException e){
@@ -32,7 +32,7 @@ public class FileDownloader {
             }
         }else{
             // File doesn't exist, return not found response
-            response = new Response(404, Response.NOT_FOUND_MESSAGE);
+            response = new Response(404, Response.NOT_FOUND_MESSAGE.getBytes());
         }
         return response;
     }

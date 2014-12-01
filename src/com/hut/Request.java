@@ -11,14 +11,14 @@ public class Request implements Serializable{
 
     public final static String FINISH = "please go away";
 
-    private final String message;
+    private final byte[] message;
     private final TYPE type;
 
     public enum TYPE{
       AUTHENTICATE, REQUEST_FILE, FINISH
     }
 
-    public Request(String message, TYPE type){
+    public Request(byte[] message, TYPE type){
         this.message = message;
         this.type = type;
     }
@@ -35,7 +35,9 @@ public class Request implements Serializable{
         return type == TYPE.FINISH;
     }
 
-    public String getMessage() {
+    public String getMessageString() {return new String(message);}
+
+    public byte[] getMessage() {
         return message;
     }
 
@@ -44,6 +46,6 @@ public class Request implements Serializable{
     }
 
     public String toString(){
-        return "Message: " + this.message + " type: " + this.type.toString();
+        return "Message: " + new String(this.message) + " type: " + this.type.toString();
     }
 }

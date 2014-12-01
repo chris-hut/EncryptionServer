@@ -20,10 +20,10 @@ public class Response implements Serializable{
     public final static int SERVER_ERROR = 500;
 
     private final int statusCode;
-    private final String message;
+    private final byte[] message;
 
 
-    public Response(int statusCode, String message){
+    public Response(int statusCode, byte[] message){
         this.statusCode = statusCode;
         this.message = message;
     }
@@ -34,12 +34,16 @@ public class Response implements Serializable{
         return statusCode;
     }
 
-    public String getMessage() {
+    public byte[] getMessage(){
         return message;
     }
 
+    public String getMessageString() {
+        return new String(message);
+    }
+
     public String toString(){
-        return "Statuscode: " + this.statusCode + " message: " + message;
+        return "Statuscode: " + this.statusCode + " message: " + new String(message);
     }
 
 }
