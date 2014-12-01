@@ -79,11 +79,19 @@ public class Client {
             }
 
         }catch(IOException e){
-            System.out.println("Error connecting to server");
             log.severe("Error connecting to server\n" + e.getMessage());
         }
 
         return false;
+    }
+
+    public boolean connectedToServer(int portNumber){
+        try{
+            new Socket(hostName, portNumber);
+            return true;
+        }catch (IOException e){
+            return false;
+        }
     }
 
     /**
@@ -114,10 +122,8 @@ public class Client {
             response = decryptResponse((Response) objectInputStream.readObject());
             log.fine("Received response: " + response.toString());
         }catch(IOException e){
-            System.out.println("Error sending request");
             log.fine("Error sending request" + e.getMessage());
         }catch(ClassNotFoundException e){
-            System.out.println("Error getting response");
             log.fine("Error receiving response/n" + e.getMessage());
         }
 

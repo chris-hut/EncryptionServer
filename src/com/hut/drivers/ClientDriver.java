@@ -24,8 +24,12 @@ public class ClientDriver {
         final int portNumber = 16000;
 
         if(!client.connectToServer(portNumber)){
-            System.out.println("Invalid credentials.");
-            System.out.println("Exiting...");
+            if(client.connectedToServer(portNumber)){
+                System.out.println("Invalid credentials.");
+                System.out.println("Exiting...");
+            } else{
+                System.out.println("Could not connect to server");
+            }
             System.exit(0);
         }
 

@@ -120,7 +120,7 @@ public class ServerThread extends Thread{
 
         }catch(IOException e){
             // User probably disconnected
-            log.info("IO error when sending response, user has likely disconnected");
+            log.fine("IO error when sending response, user has likely disconnected");
             // From: http://stackoverflow.com/a/1181325/1684866
             // Once received this, socket is now useless so lets close up everything
             System.out.println("Client has disconnected");
