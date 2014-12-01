@@ -78,7 +78,7 @@ public class ServerThread extends Thread{
                     }else if(request.isRequest()){
                         // TODO: Decrypt fileName
 
-                        String fileName = new String(request.getMessage());
+                        String fileName = request.getMessageString().trim();
                         response = fd.getFileResponse(fileName);
 
                     } else if(request.isAuthenticate()){

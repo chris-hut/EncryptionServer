@@ -11,6 +11,7 @@ public class FileDownloader {
 
     public Response getFileResponse(String fileName){
         Response response = null;
+        System.out.println("Looking for file: " + fileName);
         if(new File(fileName).exists()){
             try{
                 BufferedReader br = new BufferedReader(new FileReader(fileName));
