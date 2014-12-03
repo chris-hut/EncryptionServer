@@ -77,7 +77,6 @@ public class ClientDriver {
                     // TODO: Overwrite?
                     File file = new File(fileName);
                     // Blank file, don't want to add anything to it
-                    System.out.println(String.format("Response: %s", Arrays.toString(fileInfo)));
                     if(fileInfo.length == 2){
                         file.createNewFile();
                     }else {
