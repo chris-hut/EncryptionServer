@@ -87,7 +87,8 @@ public class Client {
 
     public boolean connectedToServer(int portNumber){
         try{
-            new Socket(hostName, portNumber);
+            Socket sock = new Socket(hostName, portNumber);
+            sock.close();
             return true;
         }catch (IOException e){
             return false;

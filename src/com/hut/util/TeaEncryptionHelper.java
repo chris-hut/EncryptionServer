@@ -82,10 +82,6 @@ public class TeaEncryptionHelper {
         return result.array();
     }
 
-    public byte[] decrypt(String input){
-        return decrypt(input.getBytes());
-    }
-
     public byte[] decrypt(byte[] input){
 
         IntBuffer ib = ByteBuffer.wrap(input).asIntBuffer();
@@ -111,10 +107,6 @@ public class TeaEncryptionHelper {
 
     public String decryptString(byte[] input){
         return new String(decrypt(input)).trim();
-    }
-
-    public String decryptString(String input){
-        return decryptString(input.getBytes());
     }
 
     public native void cEncrypt(int[] v, int[] k);

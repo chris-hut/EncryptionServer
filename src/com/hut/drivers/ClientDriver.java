@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -76,18 +77,22 @@ public class ClientDriver {
                     // TODO: Overwrite?
                     File file = new File(fileName);
                     // Blank file, don't want to add anything to it
+                    System.out.println(String.format("Response: %s", Arrays.toString(fileInfo)));
+                    if(fileInfo.length == 2){
+                        file.createNewFile();
+                    }else {
                         PrintWriter pw = new PrintWriter(file);
                         System.out.println("Downloading file...");
                         pw.print("");
-                        for(int i = 1; i < fileInfo.length; i++){
+                        for (int i = 1; i < fileInfo.length; i++) {
                             // TODO: Fancy download animation
                             pw.println(fileInfo[i]);
                         }
                         pw.close();
+                    }
                     System.out.println(String.format("File: %s download complete", fileName));
                 }catch(FileNotFoundException e){
                     System.out.println("File was not found");
-                    e.printStackTrace();
                 }catch(IOException e){
                     System.out.println("Error creating file: " + fileName);
                     e.printStackTrace();

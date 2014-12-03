@@ -20,8 +20,9 @@ public class FileDownloader {
                 StringBuilder sb = new StringBuilder();
                 sb.append(fileName);
                 // Don't want anything added for empty files
+                sb.append("\n");
                 if(f.length() > 0){
-                    sb.append("\n");
+
                     String line = br.readLine();
                     while(line != null){
                         sb.append(line).append("\n");
